@@ -256,7 +256,7 @@ func (t *group) makepkg() string {
 
 	w.WriteString(line)
 
-	w.WriteString("}")
+	w.WriteString("}\n")
 	return w.String()
 
 }
@@ -295,6 +295,7 @@ type schmea struct {
 	ComplexType []complexType `xml:"complexType"`
 	Element     []element     `xml:"element"`
 	SimpleType  []simpleType  `xml:"simpleType"`
+	Group       []group       `xml:"group"`
 }
 
 func (t *schmea) makepkg() string {
@@ -307,6 +308,10 @@ func (t *schmea) makepkg() string {
 	}
 
 	w.WriteString("}\n")
+
+	for _, k := range t.Group {
+		w.WriteString(k.makepkg())
+	}
 
 	for _, k := range t.ComplexType {
 		w.WriteString(k.makepkg())

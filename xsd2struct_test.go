@@ -45,6 +45,7 @@ func TestParseTo(t *testing.T) {
 	}
 
 	ParseTo("ref/wml.xsd", "Wml")
+	//ParseTo("ref/shared-math.xsd", "SharedMath")
 	return
 	for i, k := range tmap {
 		ParseTo(i, k)

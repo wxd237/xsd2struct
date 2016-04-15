@@ -16,6 +16,224 @@ type WmlSchema struct {
 	Document         CT_Document  `xml:"document"`
 	GlossaryDocument string       `xml:"glossaryDocument"`
 }
+type EG_PContentMath struct {
+	PContentBase          []EG_PContentBase
+	ContentRunContentBase []EG_ContentRunContentBase
+}
+type EG_PContentBase struct {
+	CustomXml string       `xml:"customXml"`
+	FldSimple []string     `xml:"fldSimple"`
+	Hyperlink CT_Hyperlink `xml:"hyperlink"`
+}
+type EG_ContentRunContentBase struct {
+	RunLevelElts []EG_RunLevelElts
+	SmartTag     CT_SmartTagRun `xml:"smartTag"`
+	Sdt          string         `xml:"sdt"`
+}
+type EG_CellMarkupElements struct {
+	CellIns   CT_TrackChange          `xml:"cellIns"`
+	CellDel   CT_TrackChange          `xml:"cellDel"`
+	CellMerge CT_CellMergeTrackChange `xml:"cellMerge"`
+}
+type EG_RangeMarkupElements struct {
+	BookmarkStart               CT_Bookmark     `xml:"bookmarkStart"`
+	BookmarkEnd                 CT_MarkupRange  `xml:"bookmarkEnd"`
+	MoveFromRangeStart          CT_MoveBookmark `xml:"moveFromRangeStart"`
+	MoveFromRangeEnd            CT_MarkupRange  `xml:"moveFromRangeEnd"`
+	MoveToRangeStart            CT_MoveBookmark `xml:"moveToRangeStart"`
+	MoveToRangeEnd              CT_MarkupRange  `xml:"moveToRangeEnd"`
+	CommentRangeStart           CT_MarkupRange  `xml:"commentRangeStart"`
+	CommentRangeEnd             CT_MarkupRange  `xml:"commentRangeEnd"`
+	CustomXmlInsRangeStart      CT_TrackChange  `xml:"customXmlInsRangeStart"`
+	CustomXmlInsRangeEnd        CT_Markup       `xml:"customXmlInsRangeEnd"`
+	CustomXmlDelRangeStart      CT_TrackChange  `xml:"customXmlDelRangeStart"`
+	CustomXmlDelRangeEnd        CT_Markup       `xml:"customXmlDelRangeEnd"`
+	CustomXmlMoveFromRangeStart CT_TrackChange  `xml:"customXmlMoveFromRangeStart"`
+	CustomXmlMoveFromRangeEnd   CT_Markup       `xml:"customXmlMoveFromRangeEnd"`
+	CustomXmlMoveToRangeStart   CT_TrackChange  `xml:"customXmlMoveToRangeStart"`
+	CustomXmlMoveToRangeEnd     CT_Markup       `xml:"customXmlMoveToRangeEnd"`
+}
+type EG_HdrFtrReferences struct {
+	HeaderReference string `xml:"headerReference"`
+	FooterReference string `xml:"footerReference"`
+}
+type EG_SectPrContents struct {
+	FootnotePr      string         `xml:"footnotePr"`
+	EndnotePr       string         `xml:"endnotePr"`
+	Type            CT_SectType    `xml:"type"`
+	PgSz            CT_PageSz      `xml:"pgSz"`
+	PgMar           CT_PageMar     `xml:"pgMar"`
+	PaperSrc        CT_PaperSource `xml:"paperSrc"`
+	PgBorders       string         `xml:"pgBorders"`
+	LnNumType       CT_LineNumber  `xml:"lnNumType"`
+	PgNumType       CT_PageNumber  `xml:"pgNumType"`
+	Cols            string         `xml:"cols"`
+	FormProt        CT_OnOff       `xml:"formProt"`
+	VAlign          CT_VerticalJc  `xml:"vAlign"`
+	NoEndnote       CT_OnOff       `xml:"noEndnote"`
+	TitlePg         CT_OnOff       `xml:"titlePg"`
+	TextDirection   string         `xml:"textDirection"`
+	Bidi            CT_OnOff       `xml:"bidi"`
+	RtlGutter       CT_OnOff       `xml:"rtlGutter"`
+	DocGrid         string         `xml:"docGrid"`
+	PrinterSettings CT_Rel         `xml:"printerSettings"`
+}
+type EG_RunInnerContent struct {
+	Br                    CT_Br      `xml:"br"`
+	T                     string     `xml:"t"`
+	ContentPart           CT_Rel     `xml:"contentPart"`
+	DelText               string     `xml:"delText"`
+	InstrText             string     `xml:"instrText"`
+	DelInstrText          string     `xml:"delInstrText"`
+	NoBreakHyphen         CT_Empty   `xml:"noBreakHyphen"`
+	SoftHyphen            CT_Empty   `xml:"softHyphen"`
+	DayShort              CT_Empty   `xml:"dayShort"`
+	MonthShort            CT_Empty   `xml:"monthShort"`
+	YearShort             CT_Empty   `xml:"yearShort"`
+	DayLong               CT_Empty   `xml:"dayLong"`
+	MonthLong             CT_Empty   `xml:"monthLong"`
+	YearLong              CT_Empty   `xml:"yearLong"`
+	AnnotationRef         CT_Empty   `xml:"annotationRef"`
+	FootnoteRef           CT_Empty   `xml:"footnoteRef"`
+	EndnoteRef            CT_Empty   `xml:"endnoteRef"`
+	Separator             CT_Empty   `xml:"separator"`
+	ContinuationSeparator CT_Empty   `xml:"continuationSeparator"`
+	Sym                   CT_Sym     `xml:"sym"`
+	PgNum                 CT_Empty   `xml:"pgNum"`
+	Cr                    CT_Empty   `xml:"cr"`
+	Tab                   CT_Empty   `xml:"tab"`
+	Object                CT_Object  `xml:"object"`
+	Pict                  CT_Picture `xml:"pict"`
+	FldChar               string     `xml:"fldChar"`
+	Ruby                  CT_Ruby    `xml:"ruby"`
+	FootnoteReference     string     `xml:"footnoteReference"`
+	EndnoteReference      string     `xml:"endnoteReference"`
+	CommentReference      CT_Markup  `xml:"commentReference"`
+	Drawing               CT_Drawing `xml:"drawing"`
+	Ptab                  CT_PTab    `xml:"ptab"`
+	LastRenderedPageBreak CT_Empty   `xml:"lastRenderedPageBreak"`
+}
+type EG_RPrBase struct {
+	RStyle          CT_String           `xml:"rStyle"`
+	RFonts          string              `xml:"rFonts"`
+	B               CT_OnOff            `xml:"b"`
+	BCs             CT_OnOff            `xml:"bCs"`
+	I               CT_OnOff            `xml:"i"`
+	ICs             CT_OnOff            `xml:"iCs"`
+	Caps            CT_OnOff            `xml:"caps"`
+	SmallCaps       CT_OnOff            `xml:"smallCaps"`
+	Strike          CT_OnOff            `xml:"strike"`
+	Dstrike         CT_OnOff            `xml:"dstrike"`
+	Outline         CT_OnOff            `xml:"outline"`
+	Shadow          CT_OnOff            `xml:"shadow"`
+	Emboss          CT_OnOff            `xml:"emboss"`
+	Imprint         CT_OnOff            `xml:"imprint"`
+	NoProof         CT_OnOff            `xml:"noProof"`
+	SnapToGrid      CT_OnOff            `xml:"snapToGrid"`
+	Vanish          CT_OnOff            `xml:"vanish"`
+	WebHidden       CT_OnOff            `xml:"webHidden"`
+	Color           CT_Color            `xml:"color"`
+	Spacing         string              `xml:"spacing"`
+	W               string              `xml:"w"`
+	Kern            string              `xml:"kern"`
+	Position        string              `xml:"position"`
+	Sz              string              `xml:"sz"`
+	SzCs            string              `xml:"szCs"`
+	Highlight       CT_Highlight        `xml:"highlight"`
+	U               string              `xml:"u"`
+	Effect          string              `xml:"effect"`
+	Bdr             string              `xml:"bdr"`
+	Shd             string              `xml:"shd"`
+	FitText         string              `xml:"fitText"`
+	VertAlign       CT_VerticalAlignRun `xml:"vertAlign"`
+	Rtl             CT_OnOff            `xml:"rtl"`
+	Cs              CT_OnOff            `xml:"cs"`
+	Em              CT_Em               `xml:"em"`
+	Lang            CT_Language         `xml:"lang"`
+	EastAsianLayout string              `xml:"eastAsianLayout"`
+	SpecVanish      CT_OnOff            `xml:"specVanish"`
+	OMath           CT_OnOff            `xml:"oMath"`
+}
+type EG_RPrContent struct {
+	RPrChange CT_RPrChange `xml:"rPrChange"`
+	RPrBase   []EG_RPrBase
+}
+type EG_RPr struct {
+	RPr CT_RPr `xml:"rPr"`
+}
+type EG_RPrMath struct {
+	RPr EG_RPr
+	Ins string         `xml:"ins"`
+	Del CT_MathCtrlDel `xml:"del"`
+}
+type EG_ParaRPrTrackChanges struct {
+	Ins      CT_TrackChange `xml:"ins"`
+	Del      CT_TrackChange `xml:"del"`
+	MoveFrom CT_TrackChange `xml:"moveFrom"`
+	MoveTo   CT_TrackChange `xml:"moveTo"`
+}
+type EG_RubyContent struct {
+	RunLevelElts []EG_RunLevelElts
+	R            CT_R `xml:"r"`
+}
+type EG_ContentRunContent struct {
+	RunLevelElts []EG_RunLevelElts
+	CustomXml    string           `xml:"customXml"`
+	SmartTag     CT_SmartTagRun   `xml:"smartTag"`
+	Sdt          string           `xml:"sdt"`
+	Dir          CT_DirContentRun `xml:"dir"`
+	Bdo          string           `xml:"bdo"`
+	R            CT_R             `xml:"r"`
+}
+type EG_ContentBlockContent struct {
+	RunLevelElts []EG_RunLevelElts
+	CustomXml    string   `xml:"customXml"`
+	Sdt          string   `xml:"sdt"`
+	P            []CT_P   `xml:"p"`
+	Tbl          []CT_Tbl `xml:"tbl"`
+}
+type EG_ContentRowContent struct {
+	RunLevelElts []EG_RunLevelElts
+	Tr           []CT_Row `xml:"tr"`
+	CustomXml    string   `xml:"customXml"`
+	Sdt          string   `xml:"sdt"`
+}
+type EG_ContentCellContent struct {
+	RunLevelElts []EG_RunLevelElts
+	Tc           []CT_Tc `xml:"tc"`
+	CustomXml    string  `xml:"customXml"`
+	Sdt          string  `xml:"sdt"`
+}
+type EG_PContent struct {
+	ContentRunContent []EG_ContentRunContent
+	FldSimple         []string     `xml:"fldSimple"`
+	Hyperlink         CT_Hyperlink `xml:"hyperlink"`
+	SubDoc            CT_Rel       `xml:"subDoc"`
+}
+type EG_FtnEdnNumProps struct {
+	NumStart   CT_DecimalNumber `xml:"numStart"`
+	NumRestart string           `xml:"numRestart"`
+}
+type EG_MathContent struct {
+}
+type EG_BlockLevelChunkElts struct {
+	ContentBlockContent []EG_ContentBlockContent
+}
+type EG_BlockLevelElts struct {
+	BlockLevelChunkElts []EG_BlockLevelChunkElts
+	AltChunk            []CT_AltChunk `xml:"altChunk"`
+}
+type EG_RunLevelElts struct {
+	RangeMarkupElements []EG_RangeMarkupElements
+	MathContent         []EG_MathContent
+	ProofErr            CT_ProofErr       `xml:"proofErr"`
+	PermStart           CT_PermStart      `xml:"permStart"`
+	PermEnd             CT_Perm           `xml:"permEnd"`
+	Ins                 CT_RunTrackChange `xml:"ins"`
+	Del                 CT_RunTrackChange `xml:"del"`
+	MoveFrom            CT_RunTrackChange `xml:"moveFrom"`
+	MoveTo              CT_RunTrackChange `xml:"moveTo"`
+}
 type CT_Empty struct {
 }
 type CT_OnOff struct {
@@ -321,7 +539,7 @@ type CT_ParaRPrChange struct {
 type CT_RunTrackChange struct {
 	CT_TrackChange
 	ContentRunContent EG_ContentRunContent
-	OMathMathElements EG_OMathMathElements
+	//	OMathMathElements EG_OMathMathElements
 }
 type CT_NumPr struct {
 	Ilvl            CT_DecimalNumber        `xml:"ilvl"`
