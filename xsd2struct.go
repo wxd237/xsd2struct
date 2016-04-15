@@ -1,49 +1,92 @@
 package xsd2struct
 
 import (
+	"encoding/xml"
 	"fmt"
 	"log"
-
-	"github.com/jteeuwen/xmlx"
+	"io/ioutil"
 )
 
 type simpleType struct {
-	name string
+	XmlName xml.Name
+	Name   string  `xml:"name,attr"`
+}
+
+type restriction struct{
+	XmlName xml.Name
+	Base    string  `xml:"base,attr"`
+}
+
+type  element struct{
+		XmlName xml.Name
+		Name 			string	`xml:"name,attr"`
+		Type			string	`xml:"type,attr"`
+		MinOccurs		string	`xml:"minOccurs,attr"`
+		MaxOccurs		string	`xml:"maxOccurs,attr"`
+		
+}
+
+type attribute struct{
+		XmlName xml.Name
+		Name 			string	`xml:"name,attr"`
+		Type			string	`xml:"type,attr"`
+		Use				string	`xml:"use,attr"`	
+}	
+
+type  complexType struct{
+	XmlName xml.Name
+	Name 			string			`xml:"name,attr"`
+	Attributettribute []attribute   		`xml:"attribute"`
+	Element   []element       		`xml:"element"`
+}
+
+func(t *complexType) makepkg(){
+	
+}
+
+type extension struct{
+		XmlName xml.Name
+		Base    string  `xml:"base,attr"`
+}
+
+
+type group struct{
+	XmlName xml.Name
+	Ref      		string	`xml:"ref,attr"`
+	MinOccurs		string	`xml:"minOccurs,attr"`
+	MaxOccurs		string	`xml:"maxOccurs,attr"`   	
+}
+
+
+type schmea struct{
+	XmlName xml.Name
+	ComplexType	[]complexType	`xml:"complexType"`
+	Element     []element 		`xml:"element"`
+}
+
+
+
+func(t *schmea) makepkg(){
+	fmt.Printf("schmea:%s\n",t.XmlName.Local)
+	for i,k:=range t.ComplexType {
+		fmt.Printf("schmea:%s\n",t.XmlName.Local)
+	}
 }
 
 func (t *simpleType) makePkg() string {
-	line := fmt.Sprintf("type %s string", t.name)
+	line := fmt.Sprintf("type %s string")
 	return line
 }
 
-type XSDFile struct {
-	filename string
-	doc      *xmlx.Document
-}
 
-func NewXSDFile(filename string) *XSDFile {
-	var x XSDFile
-	x.doc = xmlx.New()
 
-	if err := x.doc.LoadFile("./ref/wml.xsd", nil); err != nil {
+func NewXSDFile(filename string) schmea {
+	var s schmea
+	b,err:=ioutil.ReadFile(filename)
+	if err!=nil{
 		log.Fatal(err)
-
 	}
-	if len(x.doc.Root.Children) == 0 {
-		log.Fatalf("Root node has no children.")
-	}
-	return &x
-}
-
-func (this *XSDFile) ParsesimpleType() map[simpleType]string {
-	ret := make(map[simpleType]string)
-
-	snode := this.doc.SelectNodes("*", "simpleType")
-	for _, k := range snode {
-		var s simpleType
-		s.name = k.Attributes[0].Value
-		ret[s] = "string"
-		fmt.Printf("simpleType:%s \n", k.Attributes)
-	}
-	return ret
+	xml.Unmarshal(b,&s)
+	
+	return s
 }

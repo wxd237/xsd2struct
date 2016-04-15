@@ -1,9 +1,15 @@
 package xsd2struct
 
 import "testing"
+var s schmea
 
-var xsd XSDFile
 
-func TestParsesimpleType(t *testing.T) {
 
+func TestNewXSDFile(t *testing.T) {
+	s:=NewXSDFile("ref/wml.xsd")
+}
+
+
+func TestDump(t *testing.T){
+	
 }
