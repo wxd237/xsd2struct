@@ -1,13 +1,12 @@
 package xsd2struct
 
 import (
-	"bufio"
+	"bytes"
 	//"bytes"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 )
 
 type simpleType struct {
@@ -15,15 +14,16 @@ type simpleType struct {
 	Name    string `xml:"name,attr"`
 }
 
-func (t *simpleType) makepkg() {
-	w := bufio.NewWriter(os.Stdout)
+func (t *simpleType) makepkg() string {
+
+	var w bytes.Buffer
 	line1 := fmt.Sprintf("type %s struct{\n", t.Name)
 	w.WriteString(line1)
 	line2 := fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, "string", t.Name)
 	w.WriteString(line2)
 	line3 := fmt.Sprintf("}\n")
 	w.WriteString(line3)
-	w.Flush()
+	return w.String()
 }
 
 type enumeration struct {
@@ -47,11 +47,11 @@ type element struct {
 	MaxOccurs string `xml:"maxOccurs,attr"`
 }
 
-func (t *element) makepkg() {
+func (t *element) makepkg() string {
 	if t.Name == "" {
-		return
+		return ""
 	}
-	w := bufio.NewWriter(os.Stdout)
+	var w bytes.Buffer
 	var line string
 	if t.MaxOccurs != "unbounded" {
 		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, t.Type, t.Name)
@@ -61,7 +61,7 @@ func (t *element) makepkg() {
 		//w.WriteString(line)
 	}
 	w.WriteString(line)
-	w.Flush()
+	return w.String()
 
 }
 
@@ -72,14 +72,14 @@ type attribute struct {
 	Use     string `xml:"use,attr"`
 }
 
-func (t *attribute) makepkg() {
+func (t *attribute) makepkg() string {
 	if t.Name == "" {
-		return
+		return ""
 	}
-	w := bufio.NewWriter(os.Stdout)
+	var w bytes.Buffer
 	line := fmt.Sprintf("\t%s %s  `xml:\"%s\",attr`\n", t.Name, t.Type, t.Name)
 	w.WriteString(line)
-	w.Flush()
+	return w.String()
 
 }
 
@@ -92,24 +92,25 @@ type choice struct {
 	Element []element `xml:"element"`
 }
 
-func (t *choice) makepkg() {
-
+func (t *choice) makepkg() string {
+	var w bytes.Buffer
 	for _, k := range t.Group {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
 
 	for _, k := range t.Element {
-		k.makepkg()
-	}
+		w.WriteString(k.makepkg())
 
+	}
+	return w.String()
 }
 
 type complexContent struct {
 	Extension extension `xml:"extension"`
 }
 
-func (t *complexContent) makepkg() {
-	t.Extension.makepkg()
+func (t *complexContent) makepkg() string {
+	return t.Extension.makepkg()
 }
 
 type extension struct {
@@ -121,20 +122,22 @@ type extension struct {
 	Attribute []attribute `xml:"attribute"`
 }
 
-func (t *extension) makepkg() {
+func (t *extension) makepkg() string {
 	if t.Base == "" {
-		return
+		return ""
 	}
-	w := bufio.NewWriter(os.Stdout)
+	var w bytes.Buffer
 	line1 := fmt.Sprintf("\t%s\n", t.Base)
 	w.WriteString(line1)
-	w.Flush()
-	t.Choice.makepkg()
-	t.Sequence.makepkg()
+
+	w.WriteString(t.Choice.makepkg())
+
+	w.WriteString(t.Sequence.makepkg())
 
 	for _, k := range t.Attribute {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
+	return w.String()
 }
 
 type sequence struct {
@@ -144,28 +147,30 @@ type sequence struct {
 	Choice    []choice  `xml:"choice"`
 }
 
-func (t *sequence) makepkg() {
-
+func (t *sequence) makepkg() string {
+	var w bytes.Buffer
 	for _, k := range t.Element {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
 
-	t.Group.makepkg()
+	w.WriteString(t.Group.makepkg())
 
 	for _, k := range t.Choice {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
-
+	return w.String()
 }
 
 type all struct {
 	Element []element `xml:"element"`
 }
 
-func (t *all) makepkg() {
+func (t *all) makepkg() string {
+	var w bytes.Buffer
 	for _, k := range t.Element {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
+	return w.String()
 }
 
 type complexType struct {
@@ -179,32 +184,30 @@ type complexType struct {
 	ComplexContent complexContent `xml:"complexContent"`
 }
 
-func (t *complexType) makepkg() {
-	w := bufio.NewWriter(os.Stdout)
+func (t *complexType) makepkg() string {
+	var w bytes.Buffer
 	line1 := fmt.Sprintf("type %s struct{\n", t.Name)
 	w.WriteString(line1)
-	w.Flush()
 
-	t.Choice.makepkg()
-	t.ComplexContent.makepkg()
+	w.WriteString(t.Choice.makepkg())
+	w.WriteString(t.ComplexContent.makepkg())
 
-	t.Sequence.makepkg()
+	w.WriteString(t.Sequence.makepkg())
 
 	for _, k := range t.Element {
-		k.makepkg()
-	}
+		w.WriteString(k.makepkg())
 
-	w.Flush()
+	}
 
 	for _, k := range t.Attribute {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
 
-	t.All.makepkg()
+	w.WriteString(t.All.makepkg())
 
 	line3 := fmt.Sprintf("}\n")
 	w.WriteString(line3)
-	w.Flush()
+	return w.String()
 }
 
 type group struct {
@@ -215,22 +218,23 @@ type group struct {
 	MaxOccurs string `xml:"maxOccurs,attr"`
 }
 
-func (t *group) makepkg() {
-	if t.Name == "" {
-		return
+func (t *group) makepkg() string {
+
+	if t.Ref == "" {
+		return ""
 	}
-	w := bufio.NewWriter(os.Stdout)
+	var w bytes.Buffer
 	var line string
 	if t.MaxOccurs != "unbounded" {
 
 		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, t.Ref, t.Name)
-		//w.WriteString(line)
+
 	} else {
 		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", t.Name, t.Ref, t.Name)
-		//w.WriteString(line)
+
 	}
 	w.WriteString(line)
-	w.Flush()
+	return w.String()
 
 }
 
@@ -240,16 +244,21 @@ type schmea struct {
 	Element     []element     `xml:"element"`
 }
 
-func (t *schmea) makepkg() {
-	fmt.Printf("type WordSchema  struct {\n")
+func (t *schmea) makepkg() string {
+	var w bytes.Buffer
+	line1 := fmt.Sprintf("type WordSchema  struct {\n")
+	w.WriteString(line1)
 	for _, k := range t.Element {
-		k.makepkg()
+		w.WriteString(k.makepkg())
+
 	}
-	fmt.Printf("}\n")
+
+	w.WriteString("}\n")
 
 	for _, k := range t.ComplexType {
-		k.makepkg()
+		w.WriteString(k.makepkg())
 	}
+	return w.String()
 }
 
 func (t *simpleType) makePkg() string {

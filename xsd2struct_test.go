@@ -11,7 +11,9 @@ func TestNewXSDFile(t *testing.T) {
 
 	s := NewXSDFile("ref/wml.xsd")
 	fmt.Printf("%+v\n", s)
-	s.makepkg()
+	rets := s.makepkg()
+	fmt.Printf("%s\n", rets)
+
 }
 
 func TestDump(t *testing.T) {
