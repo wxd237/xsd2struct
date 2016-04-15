@@ -63,10 +63,10 @@ func (t *element) makepkg() string {
 		Curtype = strings.Replace(Curtype, "s:", "", 1)
 	}
 	if t.MaxOccurs != "unbounded" {
-		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, Curtype, t.Name)
+		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", strings.Title(t.Name), Curtype, t.Name)
 		//w.WriteString(line)
 	} else {
-		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", t.Name, Curtype, t.Name)
+		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", strings.Title(t.Name), Curtype, t.Name)
 		//w.WriteString(line)
 	}
 	w.WriteString(line)
@@ -94,7 +94,7 @@ func (t *attribute) makepkg() string {
 	}
 
 	var w bytes.Buffer
-	line := fmt.Sprintf("\t%s %s  `xml:\"%s\",attr`\n", t.Name, Curtype, t.Name)
+	line := fmt.Sprintf("\t%s %s  `xml:\"%s\",attr`\n", strings.Title(t.Name), Curtype, t.Name)
 	w.WriteString(line)
 	return w.String()
 
@@ -105,7 +105,7 @@ type attributeGroup struct {
 }
 
 type choice struct {
-	Group   []group   `xml:"group"`
+	Group   []groupb  `xml:"group"`
 	Element []element `xml:"element"`
 }
 
@@ -160,7 +160,7 @@ func (t *extension) makepkg() string {
 type sequence struct {
 	MaxOccurs string    `xml:"maxOccurs,attr"`
 	Element   []element `xml:"element"`
-	Group     group     `xml:"group"`
+	Group     []groupb  `xml:"group"`
 	Choice    []choice  `xml:"choice"`
 }
 
@@ -170,7 +170,9 @@ func (t *sequence) makepkg() string {
 		w.WriteString(k.makepkg())
 	}
 
-	w.WriteString(t.Group.makepkg())
+	for _, k := range t.Group {
+		w.WriteString(k.makepkg())
+	}
 
 	for _, k := range t.Choice {
 		w.WriteString(k.makepkg())
@@ -192,6 +194,7 @@ func (t *all) makepkg() string {
 
 type complexType struct {
 	XmlName        xml.Name
+	Group          []groupb
 	Name           string         `xml:"name,attr"`
 	Attribute      []attribute    `xml:"attribute"`
 	Element        []element      `xml:"element"`
@@ -228,26 +231,57 @@ func (t *complexType) makepkg() string {
 }
 
 type group struct {
+	XmlName  xml.Name
+	Name     string   `xml:"name,attr"`
+	Groupb   groupb   `xml:"group"`
+	Sequence sequence `xml:"sequence"`
+	Choice   choice   `xml:"choice"`
+}
+
+func (t *group) makepkg() string {
+
+	if t.Name == "" {
+		return ""
+	}
+	var w bytes.Buffer
+	var line string
+
+	line1 := fmt.Sprintf("type %s struct{\n", t.Name)
+	w.WriteString(line1)
+	w.WriteString(t.Sequence.makepkg())
+	w.WriteString(t.Groupb.makepkg())
+	w.WriteString(t.Choice.makepkg())
+	//fname := strings.Replace(t.Name, "EG_", "", 1)
+	//line = fmt.Sprintf("\t%s %s  \n", fname, t.Name)
+
+	w.WriteString(line)
+
+	w.WriteString("}")
+	return w.String()
+
+}
+
+type groupb struct {
 	XmlName   xml.Name
-	Name      string `xml:"name,attr"`
 	Ref       string `xml:"ref,attr"`
 	MinOccurs string `xml:"minOccurs,attr"`
 	MaxOccurs string `xml:"maxOccurs,attr"`
 }
 
-func (t *group) makepkg() string {
+func (t *groupb) makepkg() string {
 
 	if t.Ref == "" {
 		return ""
 	}
 	var w bytes.Buffer
 	var line string
+	fname := strings.Replace(t.Ref, "EG_", "", 1)
 	if t.MaxOccurs != "unbounded" {
 
-		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, t.Ref, t.Name)
+		line = fmt.Sprintf("\t%s %s  \n", fname, t.Ref)
 
 	} else {
-		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", t.Name, t.Ref, t.Name)
+		line = fmt.Sprintf("\t%s []%s \n", fname, t.Ref)
 
 	}
 	w.WriteString(line)
@@ -256,14 +290,16 @@ func (t *group) makepkg() string {
 }
 
 type schmea struct {
+	Prefix      string
 	XmlName     xml.Name
 	ComplexType []complexType `xml:"complexType"`
 	Element     []element     `xml:"element"`
+	SimpleType  []simpleType  `xml:"simpleType"`
 }
 
 func (t *schmea) makepkg() string {
 	var w bytes.Buffer
-	line1 := fmt.Sprintf("type WordSchema  struct {\n")
+	line1 := fmt.Sprintf("type %sSchema  struct {\n", t.Prefix)
 	w.WriteString(line1)
 	for _, k := range t.Element {
 		w.WriteString(k.makepkg())
@@ -275,6 +311,11 @@ func (t *schmea) makepkg() string {
 	for _, k := range t.ComplexType {
 		w.WriteString(k.makepkg())
 	}
+
+	for _, k := range t.SimpleType {
+		w.WriteString(k.makepkg())
+	}
+
 	return w.String()
 }
 
@@ -294,11 +335,12 @@ func NewXSDFile(filename string) schmea {
 	return s
 }
 
-func ParseTo(infile, outfile string) {
+func ParseTo(infile, schmeaname string) {
 	s := NewXSDFile(infile)
+	s.Prefix = strings.Title(schmeaname)
 	rets := s.makepkg()
-	log.Printf("%s\n", rets)
-	w, _ := os.Create(outfile)
+	log.Printf("cur hand %s:%s \n", infile, schmeaname)
+	w, _ := os.Create("refgo/" + s.Prefix + ".go")
 	defer w.Close()
 
 	w.WriteString("package ooxml\n")
