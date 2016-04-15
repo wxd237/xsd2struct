@@ -2,6 +2,8 @@ package xsd2struct
 
 import (
 	"bytes"
+	"os"
+	"strings"
 	//"bytes"
 	"encoding/xml"
 	"fmt"
@@ -53,11 +55,18 @@ func (t *element) makepkg() string {
 	}
 	var w bytes.Buffer
 	var line string
+	Curtype := t.Type
+	if strings.ContainsAny(Curtype, "xsd:") {
+		Curtype = "string"
+	}
+	if strings.ContainsAny(Curtype, "s:") {
+		Curtype = strings.Replace(Curtype, "s:", "", 1)
+	}
 	if t.MaxOccurs != "unbounded" {
-		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, t.Type, t.Name)
+		line = fmt.Sprintf("\t%s %s  `xml:\"%s\"`\n", t.Name, Curtype, t.Name)
 		//w.WriteString(line)
 	} else {
-		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", t.Name, t.Type, t.Name)
+		line = fmt.Sprintf("\t%s []%s  `xml:\"%s\"`\n", t.Name, Curtype, t.Name)
 		//w.WriteString(line)
 	}
 	w.WriteString(line)
@@ -76,8 +85,16 @@ func (t *attribute) makepkg() string {
 	if t.Name == "" {
 		return ""
 	}
+	Curtype := t.Type
+	if strings.ContainsAny(Curtype, "xsd:") {
+		Curtype = "string"
+	}
+	if strings.ContainsAny(Curtype, "s:") {
+		Curtype = strings.Replace(Curtype, "s:", "", 1)
+	}
+
 	var w bytes.Buffer
-	line := fmt.Sprintf("\t%s %s  `xml:\"%s\",attr`\n", t.Name, t.Type, t.Name)
+	line := fmt.Sprintf("\t%s %s  `xml:\"%s\",attr`\n", t.Name, Curtype, t.Name)
 	w.WriteString(line)
 	return w.String()
 
@@ -275,4 +292,17 @@ func NewXSDFile(filename string) schmea {
 	xml.Unmarshal(b, &s)
 
 	return s
+}
+
+func ParseTo(infile, outfile string) {
+	s := NewXSDFile(infile)
+	rets := s.makepkg()
+	log.Printf("%s\n", rets)
+	w, _ := os.Create(outfile)
+	defer w.Close()
+
+	w.WriteString("package ooxml\n")
+
+	w.WriteString(rets)
+	w.Close()
 }
